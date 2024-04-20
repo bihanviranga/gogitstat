@@ -10,6 +10,28 @@ import (
   "bufio"
 )
 
+// Check if a slice contains a given value
+func sliceContains(slice []string, value string) bool {
+  for _, v := range slice {
+    if v == value {
+      return true
+    }
+  }
+
+  return false
+}
+
+// Adds the items from 'new' to 'existing' without causing duplicates.
+func joinSlices(new []string, existing []string) []string {
+  for _, i := range new {
+    if !sliceContains(existing, i) {
+      existing = append(existing, i)
+    }
+  }
+
+  return existing
+}
+
 // Opens a file at the given path.
 // Creates if it doesn't exist.
 func openFile(filePath string) *os.File {
@@ -47,6 +69,12 @@ func parseFileLinesToSlice(filePath string) []string {
   }
 
   return lines
+}
+
+// Writes the content in given slice to lines on a file.
+func dumpStringsSliceToFile(repos []string, filePath string) {
+  content := strings.Join(repos, "\n")
+  ioutil.WriteFile(filePath, []byte(content), 0755)
 }
 
 // Adds the new repos to the file
