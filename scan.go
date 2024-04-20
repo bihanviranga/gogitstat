@@ -7,7 +7,54 @@ import (
   "os"
   "os/user"
   "log"
+  "bufio"
 )
+
+// Opens a file at the given path.
+// Creates if it doesn't exist.
+func openFile(filePath string) *os.File {
+  f, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0755)
+  if err != nil {
+    if os.IsNotExist(err) {
+      _, err = os.Create(filePath)
+      if err != nil {
+        panic(err)
+      }
+    } else {
+      panic(err)
+    }
+  }
+
+  return f
+}
+
+// Parses the content of a file at a given path and return them
+// as a slice.
+func parseFileLinesToSlice(filePath string) []string {
+  f := openFile(filePath)
+  defer f.Close()
+
+  var lines []string
+  scanner := bufio.NewScanner(f)
+  for scanner.Scan() {
+    lines = append(lines, scanner.Text())
+  }
+
+  if err := scanner.Err(); err != nil {
+    if err != io.EOF {
+      panic(err)
+    }
+  }
+
+  return lines
+}
+
+// Adds the new repos to the file
+func addNewSliceElementsToFile(filePath string, newRepos []string) {
+  existingRepos := parseFileLinesToSlice(filePath)
+  repos := joinSlices(newRepos, existingRepos)
+  dumpStringsSliceToFile(repos, filePath)
+}
 
 // Returns a list of subdirectories of 'directory' ending with '.git'.
 // The returned directories are the base directories of a repo, which means
