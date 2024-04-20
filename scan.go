@@ -5,6 +5,7 @@ import (
   "fmt"
   "strings"
   "os"
+  "os/user"
   "log"
 )
 
@@ -49,6 +50,25 @@ func scanGitDirectories(directories []string, directory string) []string {
   }
 
   return directories
+}
+
+// Starts the recursive search of directories from the given directory
+func recursiveScanDirectory(directory string) []string {
+  return scanGitDirectories(make([]string, 0), directory)
+}
+
+// Returns the dotfile for the repos list.
+// Creates if it does not exist. (Or does it?)
+func getDotfilePath() string {
+  usr, err = user.Current()
+  if err != nil {
+    log.Fatal(err)
+    // TODO quit here?
+  }
+
+  dotfile := usr.Homedir + "/.config/.gostat"
+
+  return dotfile
 }
 
 // Scans a directory for git repositories
