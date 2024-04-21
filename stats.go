@@ -43,20 +43,20 @@ func calcOffset() int {
   weekday := time.Now().Weekday()
 
   switch weekday {
-  case time.Sunday:
-    offset = 7
-  case time.Monday:
-    offset = 6
-  case time.Tuesday:
-    offset = 5
-  case time.Wednesday:
-    offset = 4
-  case time.Thursday:
-    offset = 3
-  case time.Friday:
-    offset = 2
-  case time.Saturday:
-    offset = 1
+    case time.Sunday:
+      offset = 7
+    case time.Monday:
+      offset = 6
+    case time.Tuesday:
+      offset = 5
+    case time.Wednesday:
+      offset = 4
+    case time.Thursday:
+      offset = 3
+    case time.Friday:
+      offset = 2
+    case time.Saturday:
+      offset = 1
   }
 
   return offset
@@ -103,6 +103,22 @@ func fillCommits(email string, path string, commits map[int]int) map[int]int {
   return commits
 }
 
+// Function for testing purposes.
+// TODO move this to a separate file.
+func printIntIntMap(m map[int]int) {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	fmt.Println("Key\tValue")
+	fmt.Println("---------------")
+	for _, k := range keys {
+		fmt.Printf("%d\t%d\n", k, m[k])
+	}
+}
+
 // Given an email, returns the commits made in last 6 months.
 func processRepositories(email string) map[int]int {
   filePath := getDotfilePath()
@@ -140,6 +156,7 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
     week := int(k/7)    // 26, 25, .., 1
     dayInWeek := k % 7  // 0, 1, 2, .., 6
 
+    // Start a new column
     if dayInWeek == 0 {
       col = column{}
     }
@@ -147,6 +164,11 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
     col = append(col, commits[k])
 
     if dayInWeek == 6 {
+      // HACK: must figure out the issue and fix this
+      if len(col) < 7 {
+        col = append(col, 0)
+      }
+      // END HACK
       cols[week] = col
     }
   }
@@ -177,7 +199,7 @@ func printMonths() {
 
 // Given the day number (starting from 0), prints the day name.
 func printDayCol(day int) {
-  out := "    "
+  out := "     "
   switch day {
     case 1:
       out = " Mon "
@@ -207,10 +229,11 @@ func printCell(val int, today bool) {
   }
 
   if val == 0 {
-    fmt.Printf(escape + " - " + "\033[0m")
+    fmt.Printf(escape + "  - " + "\033[0m")
+    return
   }
 
-  str := " %d "
+  str := "  %d "
   switch {
     case val >= 10:
       str = " %d "
@@ -230,6 +253,7 @@ func printCells(cols map[int]column) {
         printDayCol(j)
       }
       if col, ok := cols[i]; ok {
+        // Handling 'today'
         if i == 0 && j == calcOffset() - 1 {
           printCell(col[j], true)
           continue
