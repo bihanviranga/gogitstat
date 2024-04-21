@@ -147,6 +147,74 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
   return cols
 }
 
+// Prints the month names in the first line
+func printMonths() {
+  week := getBeginningOfDay(time.Now())
+    .Add(-(daysInLastSixMonths * time.Hour * 24))
+  month := week.Month()
+  fmt.Printf("        ")
+  for {
+    if week.Month() != month {
+      fmt.Printf("%s", week.Month().String()[:3])
+      month = week.Month()
+    } else {
+      fmt.Printf("    ")
+    }
+
+    week = week.Add(7 * time.Hour * 24)
+    if week.After(time.Now()) {
+      break
+    }
+  }
+  fmt.Printf("\n")
+}
+
+// Given the day number (starting from 0), prints the day name.
+func printDayCol(day int) {
+  out := "    "
+  switch day {
+    case 1:
+      out = " Mon "
+    case 3:
+      out = " Wed "
+    case 5:
+      out = " Fri "
+  }
+
+  fmt.Printf(out)
+}
+
+// Prints the formatted cell data
+func printCell(val int, today bool) {
+  escape := "\033[0;37;30m"
+  switch {
+    case val > 0 && val < 5:
+      escape = "\033[1;30;47m"
+    case val >= 5 && val < 10:
+      escape = "\033[1;30;43m"
+    case val >= 10:
+      escape = "\033[1;30;42m"
+  }
+
+  if today {
+    escape = "\033[1;37;45m"
+  }
+
+  if val == 0 {
+    fmt.Printf(escape + " - " + "\033[0m")
+  }
+
+  str := " %d "
+  switch {
+    case val >= 10:
+      str = " %d "
+    case val >= 100:
+      str = "%d "
+  }
+
+  fmt.Printf(escape + str + "\033[0m", val)
+}
+
 // Prints the cells.
 func printCells(cols map[int]column) {
   printMonths()
