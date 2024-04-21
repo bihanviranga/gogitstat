@@ -1,16 +1,17 @@
 package main
 
 import (
-  "flag"
+  "bufio"
   "fmt"
-  "strings"
+  "io"
+  "io/ioutil"
+  "log"
   "os"
   "os/user"
-  "log"
-  "bufio"
+  "strings"
 )
 
-// Check if a slice contains a given value
+// Check if a slice contains a given value.
 func sliceContains(slice []string, value string) bool {
   for _, v := range slice {
     if v == value {
@@ -77,7 +78,7 @@ func dumpStringsSliceToFile(repos []string, filePath string) {
   ioutil.WriteFile(filePath, []byte(content), 0755)
 }
 
-// Adds the new repos to the file
+// Adds the new repos to the file.
 func addNewSliceElementsToFile(filePath string, newRepos []string) {
   existingRepos := parseFileLinesToSlice(filePath)
   repos := joinSlices(newRepos, existingRepos)
@@ -127,13 +128,12 @@ func scanGitDirectories(directories []string, directory string) []string {
   return directories
 }
 
-// Starts the recursive search of directories from the given directory
+// Starts the recursive search of directories from the given directory.
 func recursiveScanDirectory(directory string) []string {
   return scanGitDirectories(make([]string, 0), directory)
 }
 
 // Returns the dotfile for the repos list.
-// Creates if it does not exist. (Or does it?)
 func getDotfilePath() string {
   usr, err = user.Current()
   if err != nil {
@@ -146,7 +146,7 @@ func getDotfilePath() string {
   return dotfile
 }
 
-// Scans a directory for git repositories
+// Scans a directory for git repositories.
 func scan(directory string) {
   fmt.Println("Directories found:")
   repositories := recursiveScanDirectory(directory)
@@ -159,18 +159,3 @@ func stats(email string) {
   fmt.Println("stats %v", email)
 }
 
-func main() {
-  var directory string
-  var email string
-
-  flag.StringVar(&directory, "add", "", "add a directory to scan for Git repos")
-  flag.StringVar(&email, "email", "your@email.com", "the email to scan")
-  flag.Parse()
-
-  if directory != "" {
-    scan(directory)
-    return
-  }
-
-  stats(email)
-}
