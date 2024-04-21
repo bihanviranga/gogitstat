@@ -156,8 +156,7 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 
 // Prints the month names in the first line.
 func printMonths() {
-  week := getBeginningOfDay(time.Now())
-    .Add(-(daysInLastSixMonths * time.Hour * 24))
+  week := getBeginningOfDay(time.Now()).Add(-(daysInLastSixMonths * time.Hour * 24))
   month := week.Month()
   fmt.Printf("        ")
   for {

@@ -36,13 +36,14 @@ func joinSlices(new []string, existing []string) []string {
 // Opens a file at the given path.
 // Creates if it doesn't exist.
 func openFile(filePath string) *os.File {
-  f, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0755)
+  f, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR, 0755)
   if err != nil {
     if os.IsNotExist(err) {
-      _, err = os.Create(filePath)
+      f, err := os.Create(filePath)
       if err != nil {
         panic(err)
       }
+      return f
     } else {
       panic(err)
     }
@@ -54,6 +55,7 @@ func openFile(filePath string) *os.File {
 // Parses the content of a file at a given path and return them
 // as a slice.
 func parseFileLinesToSlice(filePath string) []string {
+  fmt.Printf("Parsing: %s\n", filePath)
   f := openFile(filePath)
   defer f.Close()
 
@@ -135,13 +137,13 @@ func recursiveScanDirectory(directory string) []string {
 
 // Returns the dotfile for the repos list.
 func getDotfilePath() string {
-  usr, err = user.Current()
+  usr, err := user.Current()
   if err != nil {
     log.Fatal(err)
     // TODO quit here?
   }
 
-  dotfile := usr.Homedir + "/.config/.gostat"
+  dotfile := usr.HomeDir + "/.config/.gostat"
 
   return dotfile
 }
@@ -154,8 +156,3 @@ func scan(directory string) {
   addNewSliceElementsToFile(filePath, repositories)
   fmt.Println("Successfully added")
 }
-
-func stats(email string) {
-  fmt.Println("stats %v", email)
-}
-
