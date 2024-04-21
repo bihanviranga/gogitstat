@@ -180,13 +180,13 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 func printMonths() {
   week := getBeginningOfDay(time.Now()).Add(-(daysInLastSixMonths * time.Hour * 24))
   month := week.Month()
-  fmt.Printf("        ")
+	fmt.Printf("         ")
   for {
     if week.Month() != month {
-      fmt.Printf("%s", week.Month().String()[:3])
+      fmt.Printf("%s ", week.Month().String()[:3])
       month = week.Month()
     } else {
-      fmt.Printf("    ")
+			fmt.Printf("    ")
     }
 
     week = week.Add(7 * time.Hour * 24)

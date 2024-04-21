@@ -55,7 +55,6 @@ func openFile(filePath string) *os.File {
 // Parses the content of a file at a given path and return them
 // as a slice.
 func parseFileLinesToSlice(filePath string) []string {
-  fmt.Printf("Parsing: %s\n", filePath)
   f := openFile(filePath)
   defer f.Close()
 
