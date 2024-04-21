@@ -1,6 +1,10 @@
 package main
 
 import (
+  "fmt"
+  "sort"
+  "time"
+
   "gopkg.in/src-d/go-git.v4"
   "gopkg.in/src-d/go-git.v4/plumbing/object"
 )
@@ -9,6 +13,7 @@ type column []int
 
 const daysInLastSixMonths = 183
 const outOfRange = 99999
+const weeksInLastSixMonths = 26
 
 // Given a time.Time, returns the same date but with time set to 00:00:00.
 func getBeginningOfDay(t time.Time) time.Time {
@@ -17,7 +22,7 @@ func getBeginningOfDay(t time.Time) time.Time {
   return startOfDay
 }
 
-// Returns how many days have passed since the given date
+// Returns how many days have passed since the given date.
 func countDaysSinceDate(date time.Time) int {
   days := 0
   now := getBeginningOfDay(time.Now())
@@ -57,6 +62,8 @@ func calcOffset() int {
   return offset
 }
 
+// Populates a map with commit data for a given author, for a repo at
+// the given path.
 func fillCommits(email string, path string, commits map[int]int) map[int]int {
   // Create a git repo object
   repo, err := git.PlainOpen(path)
@@ -124,7 +131,7 @@ func sortMapIntoSlice(m map[int]int) []int {
   return keys
 }
 
-// Generates a map with rows and columns with commit info
+// Generates a map with rows and columns with commit info.
 func buildCols(keys []int, commits map[int]int) map[int]column {
   cols := make(map[int]column)
   col := column{}
@@ -147,7 +154,7 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
   return cols
 }
 
-// Prints the month names in the first line
+// Prints the month names in the first line.
 func printMonths() {
   week := getBeginningOfDay(time.Now())
     .Add(-(daysInLastSixMonths * time.Hour * 24))
@@ -184,7 +191,7 @@ func printDayCol(day int) {
   fmt.Printf(out)
 }
 
-// Prints the formatted cell data
+// Prints the formatted cell data.
 func printCell(val int, today bool) {
   escape := "\033[0;37;30m"
   switch {
